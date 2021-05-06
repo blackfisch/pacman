@@ -1,3 +1,5 @@
-# Starter-Projekt/-Template für C++ mit modernen Entwicklungs-Tools
+# Alternative Prüfungsleistung: Pac-Man
+Goldhardt, Rico; Kühn, Marcel
 
-* Siehe https://github.com/lefticus/cpp_starter_project und https://github.com/TheLartians/ModernCppStarter
+## Wichtige Hinweise
+- Um das Projekt erfolgreich ausführen zu können, muss in CLion die "Run/Debug Configuration" angepasst werden. Beim Runner "PacMan" muss das Working-Directory auf das Repository-Verzeichnis gesetzt werden.
