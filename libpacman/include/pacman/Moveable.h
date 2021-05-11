@@ -11,7 +11,7 @@ class Moveable : public Entity
 {
 protected:
 
-  std::vector<float>;
+  std::vector<float> velocity;
 
 public:
 

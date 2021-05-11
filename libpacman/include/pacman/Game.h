@@ -15,13 +15,17 @@ namespace Pacman
 class Game
 {
 private:
-  sf::RenderWindow window;
   World world;
-  Pacman::Pacman player;
-  Ghost[4] ghosts;
+  Pacman player;
+  Ghost ghosts[5];
   std::vector<Edible> edibles;
+  unsigned int window_width = 288;
+  unsigned int window_height = 224;
+
 
 public:
+  Game();
+  Game(unsigned int width, unsigned int height);
   void run();
 };
 }

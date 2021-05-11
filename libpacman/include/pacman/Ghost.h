@@ -11,9 +11,11 @@ class Ghost : public Moveable
 {
 protected:
   bool hasFear;
+
 public:
   void logicFear();
   virtual void logicGhost();
+  virtual ~Ghost() = default;
 };
 }
 
