@@ -14,7 +14,7 @@ Game::Game(unsigned int width, unsigned int height)
 }
 
 Game::Game() {
-  std::cout << "Game created" << std::endl;
+  spdlog::debug("Game created");
 }
 
 void Game::run()
@@ -25,7 +25,7 @@ void Game::run()
 
   sf::Image icon;
   if (!icon.loadFromFile("res/pacman-art/pacman-right/2.png")) {
-    std::cout << "ERROR Loading File" << std::endl;
+    spdlog::error("Error Loading icon file");
   };
   window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
