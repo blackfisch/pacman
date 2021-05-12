@@ -12,10 +12,11 @@ class Entity
     protected:
     std::vector<float> position;
     sf::Sprite shape;
+    sf::Texture texture;
 
     public:
     void update();
-    void draw();
+    void draw(sf::RenderWindow &window);
   };
 }
 #endif//PACMAN_ENTITY_H

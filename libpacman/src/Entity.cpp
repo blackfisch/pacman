@@ -1,4 +1,5 @@
 #include "pacman/Entity.h"
+#include <SFML/Graphics.hpp>
 
 namespace Pacman {
 
@@ -7,9 +8,9 @@ void Entity::update()
   return;
 }
 
-void Entity::draw()
+void Entity::draw(sf::RenderWindow &window)
 {
-  return;
+  window.draw(shape);
 }
 
 }

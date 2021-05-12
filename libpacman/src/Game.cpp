@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <spdlog/spdlog.h>
-
+#include "pacman/Pacman.h"
 namespace Pacman
 {
 
@@ -15,6 +15,7 @@ Game::Game(unsigned int width, unsigned int height)
 
 Game::Game() {
   spdlog::debug("Game created");
+  player = Pacman();
 }
 
 void Game::run()
@@ -42,6 +43,9 @@ void Game::run()
     }
 
     window.clear(sf::Color::Black);
+
+    player.draw(window);
+
     window.display();
   }
 }
