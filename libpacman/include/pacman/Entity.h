@@ -10,13 +10,13 @@ namespace Pacman{
 class Entity
   {
     protected:
-    std::vector<float> position;
-    sf::Sprite shape;
-    sf::Texture texture;
+      sf::Sprite shape;
+      sf::Texture texture;
 
     public:
-    void update();
-    void draw(sf::RenderWindow &window);
+      virtual void update();
+      void draw(sf::RenderWindow &window);
+      virtual ~Entity() = default;
   };
 }
 #endif//PACMAN_ENTITY_H

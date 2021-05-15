@@ -10,12 +10,13 @@ namespace Pacman{
 class Moveable : public Entity
 {
 protected:
-
-  std::vector<float> velocity;
+  sf::Vector2f velocity;
 
 public:
-
   void move();
+  void update();
+  void draw(sf::RenderWindow &window);
+  void setVelocity(sf::Vector2f vel);
 };
 }
 

@@ -18,6 +18,44 @@ Game::Game() {
   player = Pacman();
 }
 
+void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
+{
+  switch (e.key.code)
+  {
+    case sf::Keyboard::Escape:
+      w.close();
+      break;
+
+    case sf::Keyboard::Up:
+    case sf::Keyboard::W:
+      player.setVelocity(sf::Vector2f(0, -2));
+      player.setRotation(270);
+      player.flipRight();
+      break;
+
+    case sf::Keyboard::Left:
+    case sf::Keyboard::A:
+      player.setVelocity(sf::Vector2f(-2, 0));
+      player.setRotation(0);
+      player.flipLeft();
+      break;
+
+    case sf::Keyboard::Down:
+    case sf::Keyboard::S:
+      player.setVelocity(sf::Vector2f(0, 2));
+      player.setRotation(270);
+      player.flipLeft();
+      break;
+
+    case sf::Keyboard::Right:
+    case sf::Keyboard::D:
+      player.setVelocity(sf::Vector2f(2, 0));
+      player.setRotation(0);
+      player.flipRight();
+      break;
+  }
+}
+
 void Game::run()
 {
   // Creation of the game window.
@@ -25,7 +63,7 @@ void Game::run()
   window.setFramerateLimit(60);
 
   sf::Image icon;
-  if (!icon.loadFromFile("res/pacman-art/pacman-right/2.png")) {
+  if (!icon.loadFromFile("res/pacman-art/pacman/icon.png")) {
     spdlog::error("Error Loading icon file");
   };
   window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
@@ -37,13 +75,16 @@ void Game::run()
       if (event.type == sf::Event::Closed) {
         window.close();
       } else if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Escape)
-          window.close();
+        handleInput(window, event);
       }
     }
 
     window.clear(sf::Color::Black);
 
+//    Update all game objects
+    player.update();
+
+//    Draw all game objects
     player.draw(window);
 
     window.display();

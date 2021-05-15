@@ -27,6 +27,7 @@ public:
   Game();
   Game(unsigned int width, unsigned int height);
   void run();
+  void handleInput(sf::RenderWindow &window, sf::Event &e);
 };
 }
 
