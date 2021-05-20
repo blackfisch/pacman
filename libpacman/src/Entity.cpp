@@ -3,7 +3,7 @@
 
 namespace Pacman {
 
-void Entity::update()
+void Entity::update(float deltaTime)
 {
   return;
 }

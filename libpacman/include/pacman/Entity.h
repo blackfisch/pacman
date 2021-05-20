@@ -14,7 +14,7 @@ class Entity
       sf::Texture texture;
 
     public:
-      virtual void update();
+      virtual void update(float deltaTime);
       void draw(sf::RenderWindow &window);
       virtual ~Entity() = default;
   };

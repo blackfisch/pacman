@@ -3,14 +3,14 @@
 
 namespace Pacman{
 
-void Moveable::update()
+void Moveable::update(float deltaTime)
 {
-  move();
+  move(deltaTime);
 }
 
-void Moveable::move()
+void Moveable::move(float deltaTime)
 {
-  shape.move(velocity);
+  shape.move(velocity * (1.0f + deltaTime));
 }
 void Moveable::setVelocity(sf::Vector2f vel)
 {

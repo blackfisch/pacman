@@ -1,18 +1,20 @@
 #include "pacman/Pacman.h"
 #include "pacman/Moveable.h"
+#include "pacman/Game.h"
 #include <SFML/Graphics.hpp>
 #include <spdlog/spdlog.h>
 #include <iostream>
 
 namespace Pacman
 {
-Pacman::Pacman()
+Pacman::Pacman(Game* game): gameObject(game)
 {
   texture = sf::Texture();
   if (!texture.loadFromFile("res/pacman-art/pacman/pacman_spritesheet.png"))
     spdlog::error("Error Loading icon file");
+  else
+    spdlog::debug("spritesheet for player loaded successfully");
 
-  shape.setTexture(texture);
   spriteSource = sf::IntRect(-16,0,16,16);
   shape = sf::Sprite(texture,spriteSource);
 
@@ -39,19 +41,23 @@ void Pacman::animate()
   }
 }
 
-void Pacman::update()
+void Pacman::update(float deltaTime)
 {
-  Moveable::update();
+  Moveable::update(deltaTime);
   animate();
 }
 
-void Pacman::flipLeft()
+void Pacman::flipLeft(float scale)
 {
-  shape.setScale(-1,1);
+  shape.setScale(-1 * scale,1 * scale);
 }
 
-void Pacman::flipRight()
+void Pacman::flipRight(float scale)
 {
-  shape.setScale(1,1);
+  shape.setScale(1 * scale,1 * scale);
+}
+void Pacman::updateScale()
+{
+  shape.setScale(gameObject->getScale(), gameObject->getScale());
 }
 }

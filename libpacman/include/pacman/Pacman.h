@@ -9,19 +9,22 @@
 
 namespace Pacman
 {
+class Game;
 class Pacman : public Moveable
 {
 private:
   sf::IntRect spriteSource;
   sf::Clock clock;
+  Game *gameObject;
 
 public:
-  Pacman();
+  Pacman(Game* game);
   void setRotation(float angle);
   void animate();
-  void update();
-  void flipLeft();
-  void flipRight();
+  void update(float deltaTime);
+  void flipLeft(float scale);
+  void flipRight(float scale);
+  void updateScale();
 };
 }
 #endif//PACMAN_PACMAN_H

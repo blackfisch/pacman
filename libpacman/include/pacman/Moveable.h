@@ -13,8 +13,8 @@ protected:
   sf::Vector2f velocity;
 
 public:
-  void move();
-  void update();
+  void move(float deltaTime);
+  void update(float deltaTime) override;
   void draw(sf::RenderWindow &window);
   void setVelocity(sf::Vector2f vel);
 };

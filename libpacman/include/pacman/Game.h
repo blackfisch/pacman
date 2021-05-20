@@ -12,6 +12,7 @@
 
 namespace Pacman
 {
+
 class Game
 {
 private:
@@ -19,15 +20,15 @@ private:
   Pacman player;
   Ghost ghosts[5];
   std::vector<Edible> edibles;
-  unsigned int window_width = 288;
-  unsigned int window_height = 224;
-
+  unsigned int window_width = 576;
+  unsigned int window_height = 448;
+  float scaleFactor = 1.0f;
 
 public:
-  Game();
-  Game(unsigned int width, unsigned int height);
+  Game(float scale);
   void run();
   void handleInput(sf::RenderWindow &window, sf::Event &e);
+  float getScale() const;
 };
 }
 
