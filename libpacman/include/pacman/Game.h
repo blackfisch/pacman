@@ -25,6 +25,8 @@ private:
   float scaleFactor = 1.0f;
 
 public:
+  static const int boardSizeX = 36;
+  static const int boardSizeY = 28;
   Game(float scale);
   void run();
   void handleInput(sf::RenderWindow &window, sf::Event &e);

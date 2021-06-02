@@ -6,7 +6,7 @@
 namespace Pacman
 {
 
-Game::Game(float scale) : scaleFactor(scale), player(Pacman(this))
+Game::Game(float scale) : scaleFactor(scale), player(Pacman(this)), world(World(this))
 {
   spdlog::debug("Game created");
   spdlog::debug(scaleFactor);
@@ -14,6 +14,7 @@ Game::Game(float scale) : scaleFactor(scale), player(Pacman(this))
   window_height = round(window_height * scaleFactor);
 
   player.updateScale();
+  world.updateScale();
 }
 
 void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
@@ -26,28 +27,28 @@ void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
 
     case sf::Keyboard::Up:
     case sf::Keyboard::W:
-      player.setVelocity(sf::Vector2f(0, -2 * scaleFactor));
+      player.setVelocity(sf::Vector2f(0, -1.7 * scaleFactor));
       player.setRotation(270);
       player.flipRight(scaleFactor);
       break;
 
     case sf::Keyboard::Left:
     case sf::Keyboard::A:
-      player.setVelocity(sf::Vector2f(-2 * scaleFactor, 0));
+      player.setVelocity(sf::Vector2f(-1.7 * scaleFactor, 0));
       player.setRotation(0);
       player.flipLeft(scaleFactor);
       break;
 
     case sf::Keyboard::Down:
     case sf::Keyboard::S:
-      player.setVelocity(sf::Vector2f(0, 2 * scaleFactor));
+      player.setVelocity(sf::Vector2f(0, 1.7 * scaleFactor));
       player.setRotation(270);
       player.flipLeft(scaleFactor);
       break;
 
     case sf::Keyboard::Right:
     case sf::Keyboard::D:
-      player.setVelocity(sf::Vector2f(2 * scaleFactor, 0));
+      player.setVelocity(sf::Vector2f(1.7 * scaleFactor, 0));
       player.setRotation(0);
       player.flipRight(scaleFactor);
       break;
@@ -86,6 +87,7 @@ void Game::run()
     player.update(deltaTime);
 
 //    Draw all game objects
+    world.draw(window);
     player.draw(window);
 
     window.display();
