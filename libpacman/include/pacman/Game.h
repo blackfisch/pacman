@@ -23,6 +23,8 @@ private:
   unsigned int window_width = 576;
   unsigned int window_height = 448;
   float scaleFactor = 1.0f;
+  sf::View view;
+  void scaleWindow(int windowWidth, int windowHeight);
 
 public:
   static const int boardSizeX = 36;

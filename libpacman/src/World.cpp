@@ -11,6 +11,7 @@ World::World(Game* game): gameObject(game)
 {
   if (!spriteSheet.loadFromFile("res/map/MapSprites.png"))
     spdlog::error("Error loading map sprites");
+  spriteSheet.setSmooth(true);
 
   spdlog::debug("map tiles loaded");
 

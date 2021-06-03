@@ -19,6 +19,11 @@ Game::Game(float scale) : scaleFactor(scale), player(Pacman(this)), world(World(
 
 void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
 {
+  std::vector<sf::Sprite> walls = world.getMapSprites();
+  sf::Rect<float> playerPos = player.getShape().getGlobalBounds();
+  playerPos.height *= 0.8f;
+  playerPos.width *= 0.8f;
+
   switch (e.key.code)
   {
     case sf::Keyboard::Escape:
@@ -27,28 +32,56 @@ void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
 
     case sf::Keyboard::Up:
     case sf::Keyboard::W:
-      player.setVelocity(sf::Vector2f(0, -1.7 * scaleFactor));
+      // prevent rotating towards a wall
+      playerPos.top -= 8 * scaleFactor;
+      for (auto wall : walls) {
+        if (wall.getGlobalBounds().intersects(playerPos))
+          return;
+      }
+
+      player.setVelocity(sf::Vector2f(0, -1.3 * scaleFactor));
       player.setRotation(270);
       player.flipRight(scaleFactor);
       break;
 
     case sf::Keyboard::Left:
     case sf::Keyboard::A:
-      player.setVelocity(sf::Vector2f(-1.7 * scaleFactor, 0));
+      // prevent rotating towards a wall
+      playerPos.left -= 8 * scaleFactor;
+      for (auto wall : walls) {
+        if (wall.getGlobalBounds().intersects(playerPos))
+          return;
+      }
+
+      player.setVelocity(sf::Vector2f(-1.3 * scaleFactor, 0));
       player.setRotation(0);
       player.flipLeft(scaleFactor);
       break;
 
     case sf::Keyboard::Down:
     case sf::Keyboard::S:
-      player.setVelocity(sf::Vector2f(0, 1.7 * scaleFactor));
+      // prevent rotating towards a wall
+      playerPos.top += 8 * scaleFactor;
+      for (auto wall : walls) {
+        if (wall.getGlobalBounds().intersects(playerPos))
+          return;
+      }
+
+      player.setVelocity(sf::Vector2f(0, 1.3 * scaleFactor));
       player.setRotation(270);
       player.flipLeft(scaleFactor);
       break;
 
     case sf::Keyboard::Right:
     case sf::Keyboard::D:
-      player.setVelocity(sf::Vector2f(1.7 * scaleFactor, 0));
+      // prevent rotating towards a wall
+      playerPos.width += 8 * scaleFactor;
+      for (auto wall : walls) {
+        if (wall.getGlobalBounds().intersects(playerPos))
+          return;
+      }
+
+      player.setVelocity(sf::Vector2f(1.3 * scaleFactor, 0));
       player.setRotation(0);
       player.flipRight(scaleFactor);
       break;
@@ -59,7 +92,11 @@ void Game::run()
 {
   // Creation of the game window.
   sf::RenderWindow window{sf::VideoMode{ window_width, window_height }, "Pac-Man"};
-  window.setFramerateLimit(60);
+  window.setFramerateLimit(120);
+
+  view.setSize(window_width, window_height);
+  view.setCenter(view.getSize().x / 2, view.getSize().y / 2);
+  scaleWindow(window_width, window_height);
 
   sf::Image icon;
   if (!icon.loadFromFile("res/pacman-art/pacman/icon.png")) {
@@ -68,20 +105,54 @@ void Game::run()
   window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
   sf::Clock clock;
+  sf::Font fpsFont;
+  fpsFont.loadFromFile("res/font/PixelSans.ttf");
+  sf::Text fpsDisplay = sf::Text("FPS: --", fpsFont, 20);
+  fpsDisplay.setPosition(20,10);
+  fpsDisplay.setFillColor(sf::Color(255,255,0));
+  sf::RectangleShape fpsBack = sf::RectangleShape();
+  fpsBack.setPosition(18,18);
+  fpsBack.setSize(sf::Vector2f(60,18));
+  fpsBack.setFillColor(sf::Color(0,0,0));
+
+  int count = 0;
+  float avgFps = 0;
+  float fps = 0;
 
   while (window.isOpen()) {
     float deltaTime = clock.getElapsedTime().asSeconds();
+    clock.restart();
+
+    avgFps += 1.f / deltaTime;
+    ++count;
+    if (count == 5) {
+      fps = avgFps / 5.0f;
+      count = 0;
+    }
+
+
+    fpsDisplay.setString("FPS: " + std::to_string((int)std::min(std::round(fps), 120.0f)));
 
     sf::Event event;
     while (window.pollEvent(event)) {
-      if (event.type == sf::Event::Closed) {
+      switch (event.type) {
+      case sf::Event::Closed:
         window.close();
-      } else if (event.type == sf::Event::KeyPressed) {
-        handleInput(window, event);
+        break;
+
+      case sf::Event::KeyPressed:
+        handleInput(window,event);
+        break;
+
+      case sf::Event::Resized:
+        scaleWindow(event.size.width, event.size.height);
+        break;
       }
     }
 
     window.clear(sf::Color::Black);
+
+    window.setView(view);
 
 //    Update all game objects
     player.update(deltaTime);
@@ -93,10 +164,11 @@ void Game::run()
     world.draw(window);
     player.draw(window);
 
-    window.display();
 
-//    Reset the clock
-    clock.restart();
+    window.draw(fpsBack);
+    window.draw(fpsDisplay);
+
+    window.display();
   }
 }
 
@@ -184,5 +256,35 @@ void Game::checkCollisionPlayerWorld()
       return;
     }
   }
+}
+
+///
+/// Source: https://github.com/SFML/SFML/wiki/Source%3A-Letterbox-effect-using-a-view
+///
+void Game::scaleWindow(int windowWidth, int windowHeight)
+{
+  float windowRatio = windowWidth / (float) windowHeight;
+  float viewRatio = view.getSize().x / (float) view.getSize().y;
+  float sizeX = 1;
+  float sizeY = 1;
+  float posX = 0;
+  float posY = 0;
+
+  bool horizontalSpacing = true;
+  if (windowRatio < viewRatio)
+    horizontalSpacing = false;
+
+  // If horizontalSpacing is true, the black bars will appear on the left and right side.
+  // Otherwise, the black bars will appear on the top and bottom.
+
+  if (horizontalSpacing) {
+    sizeX = viewRatio / windowRatio;
+    posX = (1 - sizeX) / 2.f;
+  } else {
+    sizeY = windowRatio / viewRatio;
+    posY = (1 - sizeY) / 2.f;
+  }
+
+  view.setViewport( sf::FloatRect(posX, posY, sizeX, sizeY) );
 }
 }
