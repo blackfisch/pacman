@@ -4,6 +4,7 @@
 
 #ifndef PACMAN_PACMAN_H
 #define PACMAN_PACMAN_H
+#include <SFML/Graphics.hpp>
 #include "Moveable.h"
 #include <vector>
 
@@ -25,6 +26,7 @@ public:
   void flipLeft(float scale);
   void flipRight(float scale);
   void updateScale();
+  void setPosition(sf::Vector2f pos);
 };
 }
 #endif//PACMAN_PACMAN_H

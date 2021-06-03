@@ -44,6 +44,7 @@ public:
   void displayMap();
   void draw(sf::RenderWindow &window);
   void updateScale();
+  const std::vector<sf::Sprite> &getMapSprites() const;
 };
 }
 

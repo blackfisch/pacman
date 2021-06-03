@@ -13,4 +13,9 @@ void Entity::draw(sf::RenderWindow &window)
   window.draw(shape);
 }
 
+const sf::Sprite &Entity::getShape() const
+{
+  return shape;
+}
+
 }

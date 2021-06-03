@@ -15,6 +15,8 @@ Pacman::Pacman(Game* game): gameObject(game)
   else
     spdlog::debug("spritesheet for player loaded successfully");
 
+  texture.setSmooth(true);
+
   spriteSource = sf::IntRect(-16,0,16,16);
   shape = sf::Sprite(texture,spriteSource);
 
@@ -49,15 +51,20 @@ void Pacman::update(float deltaTime)
 
 void Pacman::flipLeft(float scale)
 {
-  shape.setScale(-1 * scale,1 * scale);
+  shape.setScale(-0.8 * scale,0.8 * scale);
 }
 
 void Pacman::flipRight(float scale)
 {
-  shape.setScale(1 * scale,1 * scale);
+  shape.setScale(0.8 * scale,0.8 * scale);
 }
 void Pacman::updateScale()
 {
-  shape.setScale(gameObject->getScale(), gameObject->getScale());
+  shape.setScale(gameObject->getScale() * 0.8f, gameObject->getScale() * 0.8f);
+}
+
+void Pacman::setPosition(sf::Vector2f pos)
+{
+  shape.setPosition(pos);
 }
 }

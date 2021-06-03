@@ -88,6 +88,9 @@ void World::displayMap()
         spriteName = MapTiles::JunctionWallRight;// 200
       };
 
+      if (spriteName == MapTiles::None)
+        continue;
+
       sf::Sprite sprite = sf::Sprite(spriteSheet, spriteRects[spriteName]);
 
       spdlog::debug("x: {}, y: {}", x * 16 * scale, y * 16 * scale);
@@ -118,6 +121,10 @@ void World::updateScale()
     (*it).setScale((*it).getScale() / oldScale * scale);
     (*it).setPosition((*it).getPosition() / oldScale * scale);
   }
+}
+const std::vector<sf::Sprite> &World::getMapSprites() const
+{
+  return mapSprites;
 }
 
 }

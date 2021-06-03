@@ -13,6 +13,9 @@ protected:
   sf::Vector2f velocity;
 
 public:
+  const sf::Vector2f &getVelocity() const;
+
+public:
   void move(float deltaTime);
   void update(float deltaTime) override;
   void draw(sf::RenderWindow &window);

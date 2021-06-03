@@ -38,5 +38,9 @@ void Moveable::draw(sf::RenderWindow &window)
 
   Entity::draw(window);
 }
+const sf::Vector2f &Moveable::getVelocity() const
+{
+  return velocity;
+}
 
 }

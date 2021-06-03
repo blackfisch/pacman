@@ -31,6 +31,7 @@ public:
   void run();
   void handleInput(sf::RenderWindow &window, sf::Event &e);
   float getScale() const;
+  void checkCollisionPlayerWorld();
 };
 }
 

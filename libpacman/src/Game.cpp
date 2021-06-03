@@ -86,6 +86,9 @@ void Game::run()
 //    Update all game objects
     player.update(deltaTime);
 
+//    Collision checks
+    checkCollisionPlayerWorld();
+
 //    Draw all game objects
     world.draw(window);
     player.draw(window);
@@ -100,5 +103,86 @@ void Game::run()
 float Game::getScale() const
 {
   return scaleFactor;
+}
+void Game::checkCollisionPlayerWorld()
+{
+  std::vector<sf::Sprite> mapBorders = world.getMapSprites();
+  sf::Rect<float> playerBounds = player.getShape().getGlobalBounds();
+
+  std::string move;
+  if (player.getVelocity().x < 0) {
+    move = "left";
+  } else if (player.getVelocity().x > 0) {
+    move = "right";
+  } else if (player.getVelocity().y < 0) {
+    move = "up";
+  } else if (player.getVelocity().y > 0) {
+    move = "down";
+  } else {
+    return;
+  }
+
+  spdlog::debug(move);
+
+  int i = 0;
+  for (sf::Sprite border : mapBorders) {
+    ++i;
+    sf::Rect<float> borderBounds = border.getGlobalBounds();
+
+    if (
+        playerBounds.left >= borderBounds.left + borderBounds.width ||
+        playerBounds.left + playerBounds.width <= borderBounds.left ||
+        playerBounds.top >= borderBounds.top + borderBounds.height ||
+        playerBounds.top + playerBounds.height <= borderBounds.top
+      ) {
+      continue;
+    }
+
+    sf::Vector2f newPos = player.getShape().getPosition();
+
+    // collision left
+    if (move == "left" && playerBounds.left < (borderBounds.left + borderBounds.width - 2)) {
+      player.setVelocity(sf::Vector2f(0, 0));
+
+      newPos.x = border.getPosition().x + borderBounds.width + (borderBounds.width / 2);
+      player.setPosition(newPos);
+
+      spdlog::debug("1; collission at {}",i);
+      return;
+    }
+
+    // collision right
+    if (move == "right" && (playerBounds.left + playerBounds.width) > (borderBounds.left + 2)) {
+      player.setVelocity(sf::Vector2f(0, 0));
+
+      newPos.x = border.getPosition().x - (borderBounds.width / 2);
+      player.setPosition(newPos);
+
+      spdlog::debug("2; collission at {}",i);
+      return;
+    }
+
+    //collision top
+    if (move == "up" && playerBounds.top < (borderBounds.top + borderBounds.height - 2)) {
+      player.setVelocity(sf::Vector2f(0, 0));
+
+      newPos.y = border.getPosition().y + borderBounds.height + (borderBounds.height / 2);
+      player.setPosition(newPos);
+
+      spdlog::debug("3; collission at {}",i);
+      return;
+    }
+
+    // collision bottom
+    if (move == "down" && (playerBounds.top + playerBounds.height) > (borderBounds.top + 2)) {
+      player.setVelocity(sf::Vector2f(0,0));
+
+      newPos.y = border.getPosition().y - (borderBounds.height / 2);
+      player.setPosition(newPos);
+
+      spdlog::debug("4; collission at {}",i);
+      return;
+    }
+  }
 }
 }

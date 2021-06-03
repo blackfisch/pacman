@@ -11,6 +11,11 @@ class Entity
   {
     protected:
       sf::Sprite shape;
+
+    public:
+      const sf::Sprite &getShape() const;
+
+    protected:
       sf::Texture texture;
 
     public:
