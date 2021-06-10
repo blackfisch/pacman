@@ -8,10 +8,14 @@
 #include <string>
 #include <map>
 #include <SFML/Graphics.hpp>
+#include <pacman/Point.h>
 
 namespace Pacman
 {
 enum class MapTiles {
+  Point, // 25
+  SuperPoint, // 50
+  Fruit, // 75
   None, // 0
   WallHorizontal, // 100
   WallVertical, // 110
@@ -34,17 +38,19 @@ private:
   std::map<MapTiles, sf::IntRect> spriteRects;
   std::vector<sf::Sprite> mapSprites;
   sf::Image mapMask;
-  std::vector<std::vector<float>> obstacles;
+  std::vector<Edible> edibles;
   Game *gameObject;
   float scale = 1.0f;
 
 public:
   World(Game* game);
-  void loadMap(std::string mapname);
+  void loadMap(const std::string&mapName);
   void displayMap();
   void draw(sf::RenderWindow &window);
   void updateScale();
   const std::vector<sf::Sprite> &getMapSprites() const;
+  const std::vector<Edible> getEdibles() const;
+  void setEdibles(const std::vector<Edible> &edibles);
 };
 }
 

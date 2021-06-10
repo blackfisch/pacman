@@ -6,12 +6,15 @@
 namespace Pacman
 {
 
-Game::Game(float scale) : scaleFactor(scale), player(Pacman(this)), world(World(this))
+Game::Game(float scale) :
+                          scaleFactor(scale),
+                          player(Pacman(this)),
+                          world(World(this)),
+                          window_width(roundf(576 * scale)),
+                          window_height(roundf(496 * scale))
 {
   spdlog::debug("Game created");
   spdlog::debug(scaleFactor);
-  window_width = round(window_width * scaleFactor);
-  window_height = round(window_height * scaleFactor);
 
   player.updateScale();
   world.updateScale();
@@ -21,8 +24,8 @@ void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
 {
   std::vector<sf::Sprite> walls = world.getMapSprites();
   sf::Rect<float> playerPos = player.getShape().getGlobalBounds();
-  playerPos.height *= 0.8f;
-  playerPos.width *= 0.8f;
+  playerPos.height *= 0.8F;
+  playerPos.width *= 0.8F;
 
   switch (e.key.code)
   {
@@ -34,7 +37,7 @@ void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
     case sf::Keyboard::W:
       // prevent rotating towards a wall
       playerPos.top -= 8 * scaleFactor;
-      for (auto wall : walls) {
+      for (const auto wall : walls) {
         if (wall.getGlobalBounds().intersects(playerPos))
           return;
       }
@@ -48,7 +51,7 @@ void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
     case sf::Keyboard::A:
       // prevent rotating towards a wall
       playerPos.left -= 8 * scaleFactor;
-      for (auto wall : walls) {
+      for (const auto wall : walls) {
         if (wall.getGlobalBounds().intersects(playerPos))
           return;
       }
@@ -62,7 +65,7 @@ void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
     case sf::Keyboard::S:
       // prevent rotating towards a wall
       playerPos.top += 8 * scaleFactor;
-      for (auto wall : walls) {
+      for (const auto wall : walls) {
         if (wall.getGlobalBounds().intersects(playerPos))
           return;
       }
@@ -76,7 +79,7 @@ void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
     case sf::Keyboard::D:
       // prevent rotating towards a wall
       playerPos.width += 8 * scaleFactor;
-      for (auto wall : walls) {
+      for (const auto wall : walls) {
         if (wall.getGlobalBounds().intersects(playerPos))
           return;
       }
@@ -108,12 +111,19 @@ void Game::run()
   sf::Font fpsFont;
   fpsFont.loadFromFile("res/font/PixelSans.ttf");
   sf::Text fpsDisplay = sf::Text("FPS: --", fpsFont, 20);
-  fpsDisplay.setPosition(20,10);
+  fpsDisplay.setPosition(10 * scaleFactor, 450 * scaleFactor);
   fpsDisplay.setFillColor(sf::Color(255,255,0));
   sf::RectangleShape fpsBack = sf::RectangleShape();
-  fpsBack.setPosition(18,18);
-  fpsBack.setSize(sf::Vector2f(60,18));
-  fpsBack.setFillColor(sf::Color(0,0,0));
+//  fpsBack.setPosition(18,18);
+//  fpsBack.setSize(sf::Vector2f(60,18));
+//  fpsBack.setFillColor(sf::Color(0,0,0));
+
+  sf::Font pointFont;
+  pointFont.loadFromFile("res/font/MegaPixel.ttf");
+  sf::Text pointsDisplay = sf::Text("SCORE  0", pointFont, 30);
+  pointsDisplay.setPosition(window_width / 2 - 100, 450 * scaleFactor);
+  pointsDisplay.setFillColor(sf::Color(255,255,255));
+
 
   int count = 0;
   float avgFps = 0;
@@ -132,6 +142,7 @@ void Game::run()
 
 
     fpsDisplay.setString("FPS: " + std::to_string((int)std::min(std::round(fps), 120.0f)));
+    pointsDisplay.setString("SCORE  " + std::to_string(pointCounter));
 
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -159,6 +170,7 @@ void Game::run()
 
 //    Collision checks
     checkCollisionPlayerWorld();
+    checkCollisionPlayerPoints();
 
 //    Draw all game objects
     world.draw(window);
@@ -167,6 +179,7 @@ void Game::run()
 
     window.draw(fpsBack);
     window.draw(fpsDisplay);
+    window.draw(pointsDisplay);
 
     window.display();
   }
@@ -176,6 +189,20 @@ float Game::getScale() const
 {
   return scaleFactor;
 }
+void Game::checkCollisionPlayerPoints()
+{
+  std::vector<Edible> food = world.getEdibles();
+
+  for (auto it = std::begin(food); it != std::end(food); ++it) {
+    if (player.getShape().getGlobalBounds().intersects(it->getShape().getGlobalBounds())) {
+      food.erase(it);
+      pointCounter += it->getPointValue();
+      world.setEdibles(food);
+      spdlog::debug("point!");
+      return;
+    }
+  }
+};
 void Game::checkCollisionPlayerWorld()
 {
   std::vector<sf::Sprite> mapBorders = world.getMapSprites();

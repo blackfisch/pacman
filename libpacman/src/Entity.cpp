@@ -17,5 +17,8 @@ const sf::Sprite &Entity::getShape() const
 {
   return shape;
 }
+Entity::Entity(sf::Sprite sprite): shape(sprite)
+{
+}
 
 }

@@ -18,10 +18,12 @@ class Game
 private:
   World world;
   Pacman player;
-  Ghost ghosts[5];
+//  Ghost ghosts[5];
+  int pointCounter = 0;
   std::vector<Edible> edibles;
   unsigned int window_width = 576;
-  unsigned int window_height = 448;
+  unsigned int window_height = 496;
+//  unsigned int window_height = 448;
   float scaleFactor = 1.0f;
   sf::View view;
   void scaleWindow(int windowWidth, int windowHeight);
@@ -34,6 +36,7 @@ public:
   void handleInput(sf::RenderWindow &window, sf::Event &e);
   float getScale() const;
   void checkCollisionPlayerWorld();
+  void checkCollisionPlayerPoints();
 };
 }
 

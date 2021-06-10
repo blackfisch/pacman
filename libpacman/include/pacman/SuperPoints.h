@@ -5,10 +5,10 @@
 #ifndef PACMAN_SUPERPOINTS_H
 #define PACMAN_SUPERPOINTS_H
 
-#include "Points.h"
+#include "Point.h"
 namespace Pacman
 {
-class SuperPoints : public Points
+class SuperPoints : public Point
 {
 
 };

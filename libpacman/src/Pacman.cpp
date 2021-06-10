@@ -22,7 +22,7 @@ Pacman::Pacman(Game* game): gameObject(game)
 
   sf::Rect size = shape.getLocalBounds();
   shape.setOrigin(size.width / 2, size.height / 2);
-  shape.setPosition(100,100);
+  shape.setPosition(288,248);
 }
 
 void Pacman::setRotation(float angle)

@@ -11,17 +11,15 @@ class Entity
   {
     protected:
       sf::Sprite shape;
-
-    public:
-      const sf::Sprite &getShape() const;
-
-    protected:
       sf::Texture texture;
 
     public:
+      Entity() = default;
+      Entity(sf::Sprite sprite);
+      virtual ~Entity() = default;
       virtual void update(float deltaTime);
       void draw(sf::RenderWindow &window);
-      virtual ~Entity() = default;
+      const sf::Sprite &getShape() const;
   };
 }
 #endif//PACMAN_ENTITY_H

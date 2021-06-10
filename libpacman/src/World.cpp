@@ -3,6 +3,8 @@
 #include <pacman/Game.h>
 #include <string>
 #include <spdlog/spdlog.h>
+#include <algorithm>
+#include <set>
 
 namespace Pacman
 {
@@ -15,7 +17,8 @@ World::World(Game* game): gameObject(game)
 
   spdlog::debug("map tiles loaded");
 
-  MapTiles tileNames[12] = {
+  MapTiles tileNames[15] = {
+    MapTiles::Point, MapTiles::SuperPoint, MapTiles::Fruit,
     MapTiles::CornerWallLeftTop, MapTiles::CornerWallRightBottom, MapTiles::CornerWallLeftBottom, MapTiles::CornerWallRightTop,
     MapTiles::WallHorizontal, MapTiles::WallVertical,
     MapTiles::JunctionWallRight, MapTiles::JunctionWallLeft, MapTiles::JunctionWallUp, MapTiles::JunctionWallDown,
@@ -23,7 +26,7 @@ World::World(Game* game): gameObject(game)
     MapTiles::None
   };
 
-  for (int i=0; i<12; ++i) {
+  for (int i=0; i<std::size(tileNames); i++) {
 //    sf::Sprite sprite = sf::Sprite(spriteSheet, sf::IntRect(16*i, 0, 16, 16));
     sf::IntRect rect = sf::IntRect(16*i, 0, 16, 16);
     spriteRects[tileNames[i]] = rect;
@@ -35,9 +38,9 @@ World::World(Game* game): gameObject(game)
   displayMap();
 }
 
-void World::loadMap(std::string mapname)
+void World::loadMap(const std::string& mapName)
 {
-  if (!mapMask.loadFromFile("res/map/" + mapname +".png"))
+  if (!mapMask.loadFromFile("res/map/" + mapName +".png"))
     spdlog::error("Error loading map mask");
 
   spdlog::debug("map mask loaded");
@@ -47,14 +50,25 @@ void World::displayMap()
 {
   int width = Game::boardSizeX;
   int height = Game::boardSizeY;
+  const std::set<MapTiles> pointTypes = {MapTiles::Point, MapTiles::SuperPoint, MapTiles::Fruit};
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       MapTiles spriteName = MapTiles::None;
-      spdlog::debug("x: {} y: {}", x,  y);
-      spdlog::debug("pixel: {}", (int)mapMask.getPixel(x,y).b);
+//      spdlog::debug("x: {} y: {}", x,  y);
+//      spdlog::debug("pixel: {}", (int)mapMask.getPixel(x,y).b);
 
       switch ((int)mapMask.getPixel(x,y).b) {
+      case 25:
+        spriteName = MapTiles::Point;// 25
+//        spdlog::debug("point");
+        break;
+      case 50:
+        spriteName = MapTiles::SuperPoint;// 50
+        break;
+      case 75:
+        spriteName = MapTiles::Fruit;// 75
+        break;
       case 100:
         spriteName = MapTiles::WallHorizontal;// 100
         break;
@@ -66,6 +80,7 @@ void World::displayMap()
         break;
       case 130:
         spriteName = MapTiles::CornerWallLeftTop;// 130
+//        spdlog::debug("LT");
         break;
       case 140:
         spriteName = MapTiles::CornerWallRightTop;// 140
@@ -87,17 +102,27 @@ void World::displayMap()
         break;
       case 200:
         spriteName = MapTiles::JunctionWallRight;// 200
+        break;
       };
 
       if (spriteName == MapTiles::None)
         continue;
 
       sf::Sprite sprite = sf::Sprite(spriteSheet, spriteRects[spriteName]);
+      spdlog::debug(spriteRects[MapTiles::Point].left);
+//      sf::Sprite sprite = sf::Sprite(spriteSheet, spriteRects[MapTiles::WallVertical]);
 
-      spdlog::debug("x: {}, y: {}", x * 16 * scale, y * 16 * scale);
-      spdlog::debug("x: {}, y: {}, scale: {}", x, y, scale);
+
+//      spdlog::debug("x: {}, y: {}", x * 16 * scale, y * 16 * scale);
+//      spdlog::debug("x: {}, y: {}, scale: {}", x, y, scale);
 
       sprite.setPosition(x * 16, y * 16);
+
+      if (pointTypes.find(spriteName) != pointTypes.end()) {
+//        spdlog::debug("point type");
+        edibles.push_back(Point{sprite});
+        continue;
+      }
 
       mapSprites.push_back(sprite);
     }
@@ -106,11 +131,12 @@ void World::displayMap()
 
 void World::draw(sf::RenderWindow &window)
 {
-  for (auto it = std::begin(mapSprites); it != std::end(mapSprites); ++it) {
-//    spdlog::debug(*it);
+  for (sf::Sprite sprite : mapSprites) {
+    window.draw(sprite);
+  }
 
-//    spdlog::debug(sizeof(*it));
-    window.draw(*it);
+  for (Edible food : edibles) {
+    window.draw(food.getShape());
   }
 }
 void World::updateScale()
@@ -118,14 +144,30 @@ void World::updateScale()
   float oldScale = scale;
   scale = gameObject->getScale();
 
-  for (auto it = std::begin(mapSprites); it != std::end(mapSprites); ++it) {
-    (*it).setScale((*it).getScale() / oldScale * scale);
-    (*it).setPosition((*it).getPosition() / oldScale * scale);
+  for (sf::Sprite sprite : mapSprites) {
+    sprite.setScale(sprite.getScale() / oldScale * scale);
+    sprite.setPosition(sprite.getPosition() / oldScale * scale);
+  }
+
+
+  for (Edible food : edibles) {
+    sf::Sprite sprite = food.getShape();
+    sprite.setScale(sprite.getScale() / oldScale * scale);
+    sprite.setPosition(sprite.getPosition() / oldScale * scale);
   }
 }
 const std::vector<sf::Sprite> &World::getMapSprites() const
 {
   return mapSprites;
 }
+const std::vector<Edible> World::getEdibles() const
+{
+  return edibles;
+}
+void World::setEdibles(const std::vector<Edible> &edibles)
+{
+  World::edibles = edibles;
+}
+
 
 }
