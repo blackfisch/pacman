@@ -9,8 +9,13 @@ namespace Pacman
 {
 class Pinky : public Ghost
 {
+private:
+  void update(float deltaTime);
+
 public:
+  Pinky(Game* game);
   void logicGhost();
+
 };
 }
 

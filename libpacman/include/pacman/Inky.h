@@ -9,7 +9,11 @@ namespace Pacman
 {
 class Inky : public Ghost
 {
+private:
+  void update(float deltaTime);
+
 public:
+  Inky(Game* game);
   void logicGhost();
 };
 

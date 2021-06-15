@@ -1,7 +1,11 @@
 #include "pacman/Moveable.h"
+#include "pacman/Game.h"
 #include <spdlog/spdlog.h>
 
 namespace Pacman{
+Moveable::Moveable(Game* game): gameObject(game) {
+
+}
 
 void Moveable::update(float deltaTime)
 {
@@ -38,9 +42,14 @@ void Moveable::draw(sf::RenderWindow &window)
 
   Entity::draw(window);
 }
+
 const sf::Vector2f &Moveable::getVelocity() const
 {
   return velocity;
+}
+void Moveable::updateScale()
+{
+  shape.setScale(gameObject->getScale() * 0.8f, gameObject->getScale() * 0.8f);
 }
 
 }

@@ -7,7 +7,7 @@
 
 namespace Pacman
 {
-Pacman::Pacman(Game* game): gameObject(game)
+Pacman::Pacman(Game* game): Moveable(game)
 {
   texture = sf::Texture();
   if (!texture.loadFromFile("res/pacman-art/pacman/pacman_spritesheet.png"))
@@ -57,10 +57,6 @@ void Pacman::flipLeft(float scale)
 void Pacman::flipRight(float scale)
 {
   shape.setScale(0.8 * scale,0.8 * scale);
-}
-void Pacman::updateScale()
-{
-  shape.setScale(gameObject->getScale() * 0.8f, gameObject->getScale() * 0.8f);
 }
 
 void Pacman::setPosition(sf::Vector2f pos)

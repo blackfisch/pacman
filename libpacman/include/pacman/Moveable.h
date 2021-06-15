@@ -7,19 +7,23 @@
 #include <vector>
 #include "Entity.h"
 namespace Pacman{
+class Game;
 class Moveable : public Entity
 {
 protected:
   sf::Vector2f velocity;
+  Game *gameObject;
 
 public:
   const sf::Vector2f &getVelocity() const;
 
 public:
+  Moveable(Game* game);
   void move(float deltaTime);
   void update(float deltaTime) override;
   void draw(sf::RenderWindow &window);
   void setVelocity(sf::Vector2f vel);
+  void updateScale();
 };
 }
 

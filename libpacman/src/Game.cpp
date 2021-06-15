@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <spdlog/spdlog.h>
+#include <pacman/Clyde.h>
 #include "pacman/Pacman.h"
 namespace Pacman
 {
@@ -10,6 +11,10 @@ Game::Game(float scale) :
                           scaleFactor(scale),
                           player(Pacman(this)),
                           world(World(this)),
+                          clyde(Clyde(this)),
+                          blinky(Blinky(this)),
+                          inky(Inky(this)),
+                          pinky(Pinky(this)),
                           window_width(roundf(576 * scale)),
                           window_height(roundf(496 * scale))
 {
@@ -175,6 +180,10 @@ void Game::run()
 //    Draw all game objects
     world.draw(window);
     player.draw(window);
+    clyde.draw(window);
+    blinky.draw(window);
+    inky.draw(window);
+    pinky.draw(window);
 
 
     window.draw(fpsBack);

@@ -16,7 +16,6 @@ class Pacman : public Moveable
 private:
   sf::IntRect spriteSource;
   sf::Clock clock;
-  Game *gameObject;
 
 public:
   Pacman(Game* game);
@@ -25,7 +24,6 @@ public:
   void update(float deltaTime);
   void flipLeft(float scale);
   void flipRight(float scale);
-  void updateScale();
   void setPosition(sf::Vector2f pos);
 };
 }

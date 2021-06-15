@@ -7,14 +7,16 @@
 #include "Moveable.h"
 namespace Pacman
 {
+class Game;
 class Ghost : public Moveable
 {
 protected:
   bool hasFear;
 
 public:
+  Ghost(Game* game);
   void logicFear();
-  virtual void logicGhost();
+  virtual void logicGhost() {};
   virtual ~Ghost() = default;
 };
 }

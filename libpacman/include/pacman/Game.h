@@ -9,6 +9,10 @@
 #include "Pacman.h"
 #include "Ghost.h"
 #include "Edible.h"
+#include "Clyde.h"
+#include "Blinky.h"
+#include "Inky.h"
+#include "Pinky.h"
 
 namespace Pacman
 {
@@ -18,7 +22,11 @@ class Game
 private:
   World world;
   Pacman player;
-//  Ghost ghosts[5];
+ // Ghost ghosts[4];
+  Clyde clyde;
+  Blinky blinky;
+  Inky inky;
+  Pinky pinky;
   int pointCounter = 0;
   std::vector<Edible> edibles;
   unsigned int window_width = 576;
