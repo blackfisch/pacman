@@ -10,12 +10,10 @@ namespace Pacman
 {
 class Blinky : public Ghost
 {
-private:
-  void update(float deltaTime);
-
 public:
   Blinky(Game* game);
-  void logicGhost();
+  void logicGhost() override;
+  void update(float deltaTime);
 };
 }
 

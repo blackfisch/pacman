@@ -22,7 +22,7 @@ Pacman::Pacman(Game* game): Moveable(game)
 
   sf::Rect size = shape.getLocalBounds();
   shape.setOrigin(size.width / 2, size.height / 2);
-  shape.setPosition(288,248);
+  shape.setPosition(224,376);
 }
 
 void Pacman::setRotation(float angle)
@@ -51,12 +51,12 @@ void Pacman::update(float deltaTime)
 
 void Pacman::flipLeft(float scale)
 {
-  shape.setScale(-0.8 * scale,0.8 * scale);
+  shape.setScale(-1 * scale,scale);
 }
 
 void Pacman::flipRight(float scale)
 {
-  shape.setScale(0.8 * scale,0.8 * scale);
+  shape.setScale(scale,scale);
 }
 
 void Pacman::setPosition(sf::Vector2f pos)

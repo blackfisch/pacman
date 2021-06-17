@@ -49,7 +49,17 @@ const sf::Vector2f &Moveable::getVelocity() const
 }
 void Moveable::updateScale()
 {
-  shape.setScale(gameObject->getScale() * 0.8f, gameObject->getScale() * 0.8f);
+  shape.setScale(gameObject->getScale(), gameObject->getScale());
+}
+sf::Vector2i Moveable::getCurrentTile()
+{
+  sf::Vector2i position;
+  sf::FloatRect bounds = this->getShape().getGlobalBounds();
+
+  position.x = div((bounds.left + bounds.width / 2), 16 * gameObject->getScale()).quot;
+  position.y = div((bounds.top + bounds.height / 2), 16 * gameObject->getScale()).quot;
+
+  return position;
 }
 
 }

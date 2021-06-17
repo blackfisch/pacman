@@ -15,7 +15,6 @@ private:
 public:
   Pinky(Game* game);
   void logicGhost();
-
 };
 }
 

@@ -12,11 +12,18 @@ class Ghost : public Moveable
 {
 protected:
   bool hasFear;
+  sf::Vector2f homeCorner;
+  sf::Vector2i targetTile;
+  int getDirectionIndex();
+  int getOppositeDirection(int dir);
 
 public:
-  Ghost(Game* game);
+  Ghost(Game* game, sf::Vector2f home);
   void logicFear();
+  bool wallReached();
+  std::map<int,sf::Vector2i> getFreeSurroundingTiles();
   virtual void logicGhost() {};
+  void update(float deltaTime);
   virtual ~Ghost() = default;
 };
 }

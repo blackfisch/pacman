@@ -15,15 +15,14 @@ protected:
   Game *gameObject;
 
 public:
-  const sf::Vector2f &getVelocity() const;
-
-public:
   Moveable(Game* game);
+  const sf::Vector2f &getVelocity() const;
   void move(float deltaTime);
   void update(float deltaTime) override;
   void draw(sf::RenderWindow &window);
   void setVelocity(sf::Vector2f vel);
   void updateScale();
+  sf::Vector2i getCurrentTile();
 };
 }
 

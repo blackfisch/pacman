@@ -6,7 +6,6 @@
 #define PACMAN_WORLD_H
 #include <vector>
 #include <string>
-#include <map>
 #include <SFML/Graphics.hpp>
 #include <pacman/Point.h>
 
@@ -41,8 +40,11 @@ private:
   std::vector<Edible> edibles;
   Game *gameObject;
   float scale = 1.0f;
+  std::vector<std::vector<MapTiles>> tileMap;
 
 public:
+  static const int boardSizeX = 28;
+  static const int boardSizeY = 31;
   World(Game* game);
   void loadMap(const std::string&mapName);
   void displayMap();
@@ -51,6 +53,7 @@ public:
   const std::vector<sf::Sprite> &getMapSprites() const;
   const std::vector<Edible> getEdibles() const;
   void setEdibles(const std::vector<Edible> &edibles);
+  const std::vector<std::vector<MapTiles>> &getTileMap() const;
 };
 }
 

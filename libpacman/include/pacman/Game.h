@@ -29,22 +29,22 @@ private:
   Pinky pinky;
   int pointCounter = 0;
   std::vector<Edible> edibles;
-  unsigned int window_width = 576;
-  unsigned int window_height = 496;
-//  unsigned int window_height = 448;
+  unsigned int window_width;
+  unsigned int window_height;
   float scaleFactor = 1.0f;
   sf::View view;
   void scaleWindow(int windowWidth, int windowHeight);
 
 public:
-  static const int boardSizeX = 36;
-  static const int boardSizeY = 28;
   Game(float scale);
   void run();
   void handleInput(sf::RenderWindow &window, sf::Event &e);
   float getScale() const;
   void checkCollisionPlayerWorld();
   void checkCollisionPlayerPoints();
+  void checkCollisionPlayerGhosts();
+  const World &getWorld() const;
+  sf::Vector2i getPlayerTile();
 };
 }
 

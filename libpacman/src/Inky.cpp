@@ -3,7 +3,7 @@
 
 namespace Pacman
 {
-Inky::Inky(Game *game): Ghost(game)
+Inky::Inky(Game *game): Ghost(game, sf::Vector2f(25, 32))
 {
   texture = sf::Texture();
   if (!texture.loadFromFile("res/pacman-art/ghosts/inky.png"))
@@ -17,7 +17,7 @@ Inky::Inky(Game *game): Ghost(game)
 
   sf::Rect size = shape.getLocalBounds();
   shape.setOrigin(size.width / 2, size.height / 2);
-  shape.setPosition(264,216);
+  shape.setPosition(12 * 16,14.5 * 16);
 }
 
 void Inky::update(float deltaTime)

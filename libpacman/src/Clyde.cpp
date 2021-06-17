@@ -3,7 +3,7 @@
 
 namespace Pacman
 {
-Clyde::Clyde(Game *game): Ghost(game)
+Clyde::Clyde(Game *game): Ghost(game, sf::Vector2f(2, 32))
 {
   texture = sf::Texture();
   if (!texture.loadFromFile("res/pacman-art/ghosts/clyde.png"))
@@ -17,7 +17,7 @@ Clyde::Clyde(Game *game): Ghost(game)
 
   sf::Rect size = shape.getLocalBounds();
   shape.setOrigin(size.width / 2, size.height / 2);
-  shape.setPosition(312,216);
+  shape.setPosition(14 * 16, 14.5 * 16);
 }
 
 void Clyde::update(float deltaTime)

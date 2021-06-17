@@ -15,7 +15,7 @@ World::World(Game* game): gameObject(game)
     spdlog::error("Error loading map sprites");
   spriteSheet.setSmooth(true);
 
-  spdlog::debug("map tiles loaded");
+  spdlog::debug("map tileMap loaded");
 
   MapTiles tileNames[15] = {
     MapTiles::Point, MapTiles::SuperPoint, MapTiles::Fruit,
@@ -48,8 +48,8 @@ void World::loadMap(const std::string& mapName)
 
 void World::displayMap()
 {
-  int width = Game::boardSizeX;
-  int height = Game::boardSizeY;
+  int width = boardSizeX;
+  int height = boardSizeY;
   const std::set<MapTiles> pointTypes = {MapTiles::Point, MapTiles::SuperPoint, MapTiles::Fruit};
 
   for (int y = 0; y < height; ++y) {
@@ -104,6 +104,14 @@ void World::displayMap()
         spriteName = MapTiles::JunctionWallRight;// 200
         break;
       };
+
+      std::vector<MapTiles> temp;
+      if (x > 0) {
+        temp = tileMap.at(y);
+        tileMap.erase(tileMap.begin() + y);
+      }
+      temp.insert(temp.begin() + x, spriteName);
+      tileMap.insert(tileMap.begin() + y, temp);
 
       if (spriteName == MapTiles::None)
         continue;
@@ -167,6 +175,10 @@ const std::vector<Edible> World::getEdibles() const
 void World::setEdibles(const std::vector<Edible> &edibles)
 {
   World::edibles = edibles;
+}
+const std::vector<std::vector<MapTiles>> &World::getTileMap() const
+{
+  return tileMap;
 }
 
 
