@@ -18,7 +18,7 @@ World::World(Game* game): gameObject(game)
   spdlog::debug("map tileMap loaded");
 
   MapTiles tileNames[15] = {
-    MapTiles::Point, MapTiles::SuperPoint, MapTiles::Fruit,
+    MapTiles::Point, MapTiles::PowerPellet, MapTiles::Fruit,
     MapTiles::CornerWallLeftTop, MapTiles::CornerWallRightBottom, MapTiles::CornerWallLeftBottom, MapTiles::CornerWallRightTop,
     MapTiles::WallHorizontal, MapTiles::WallVertical,
     MapTiles::JunctionWallRight, MapTiles::JunctionWallLeft, MapTiles::JunctionWallUp, MapTiles::JunctionWallDown,
@@ -50,7 +50,7 @@ void World::displayMap()
 {
   int width = boardSizeX;
   int height = boardSizeY;
-  const std::set<MapTiles> pointTypes = {MapTiles::Point, MapTiles::SuperPoint, MapTiles::Fruit};
+  const std::set<MapTiles> pointTypes = {MapTiles::Point, MapTiles::PowerPellet, MapTiles::Fruit};
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
@@ -64,7 +64,7 @@ void World::displayMap()
 //        spdlog::debug("point");
         break;
       case 50:
-        spriteName = MapTiles::SuperPoint;// 50
+        spriteName = MapTiles::PowerPellet;// 50
         break;
       case 75:
         spriteName = MapTiles::Fruit;// 75
@@ -128,6 +128,7 @@ void World::displayMap()
 
       if (pointTypes.find(spriteName) != pointTypes.end()) {
 //        spdlog::debug("point type");
+
         edibles.push_back(Point{sprite});
         continue;
       }
@@ -179,6 +180,11 @@ void World::setEdibles(const std::vector<Edible> &edibles)
 const std::vector<std::vector<MapTiles>> &World::getTileMap() const
 {
   return tileMap;
+}
+
+bool World::isInWorld(sf::Vector2i tile)
+{
+  return (tile.x < World::boardSizeX && tile.x >= 0 && tile.y < World::boardSizeY && tile.y >= 0);
 }
 
 

@@ -25,7 +25,7 @@ Game::Game(float scale) :
   world.updateScale();
 }
 
-void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
+void Game::handleGameInput(sf::RenderWindow &window, sf::Event &e)
 {
   std::vector<sf::Sprite> walls = world.getMapSprites();
   sf::Rect<float> playerPos = player.getShape().getGlobalBounds();
@@ -35,7 +35,7 @@ void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
   switch (e.key.code)
   {
     case sf::Keyboard::Escape:
-      w.close();
+      gameRunning = false;
       break;
 
     case sf::Keyboard::Up:
@@ -95,6 +95,13 @@ void Game::handleInput(sf::RenderWindow &w, sf::Event &e)
       break;
   }
 }
+void Game::handleMenuInput(sf::RenderWindow &window, sf::Event &e)
+{
+//    if (gameOver)
+//      window.close();
+
+    gameRunning = true;
+}
 
 void Game::run()
 {
@@ -113,24 +120,48 @@ void Game::run()
   window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
   sf::Clock clock;
-  sf::Font fpsFont;
-  fpsFont.loadFromFile("res/font/PixelSans.ttf");
-  sf::Text fpsDisplay = sf::Text("FPS: --", fpsFont, 20);
+  sf::Font pixelSans;
+  pixelSans.loadFromFile("res/font/PixelSans.ttf");
+  sf::Text fpsDisplay = sf::Text("FPS: --", pixelSans, 20);
   fpsDisplay.setPosition(10 * scaleFactor, 495 * scaleFactor);
   fpsDisplay.setFillColor(sf::Color(255,255,0));
 
-  sf::Font pointFont;
-  pointFont.loadFromFile("res/font/MegaPixel.ttf");
-  sf::Text pointsDisplay = sf::Text("SCORE  0", pointFont, 30);
+  sf::Font megaPixel;
+  megaPixel.loadFromFile("res/font/MegaPixel.ttf");
+  sf::Text pointsDisplay = sf::Text("SCORE  0", megaPixel, 30);
   pointsDisplay.setPosition(window_width / 2 - 100, 495 * scaleFactor);
   pointsDisplay.setFillColor(sf::Color(255,255,255));
 
+  sf::Text gameOverText = sf::Text("GAME OVER", megaPixel, 40);
+  sf::FloatRect gameOverSize = gameOverText.getLocalBounds();
+  gameOverText.setOrigin(sf::Vector2f(gameOverSize.left + gameOverSize.width / 2, gameOverSize.top + gameOverSize.height / 2));
+  gameOverText.setPosition(window_width / 2, window_height / 2);
+  gameOverText.setFillColor(sf::Color(255,255,0));
+  gameOverText.setOutlineThickness(3);
+  gameOverText.setOutlineColor(sf::Color(50,50,50));
+
+  sf::Text highScore = sf::Text("HIGH SCORE: ", megaPixel, 35);
+  sf::FloatRect highScoreSize = gameOverText.getLocalBounds();
+  highScore.setOrigin(sf::Vector2f(highScoreSize.left + highScoreSize.width / 2, highScoreSize.top + highScoreSize.height / 2));
+  highScore.setPosition(window_width / 2, window_height / 2 + 45 * scaleFactor);
+  highScore.setFillColor(sf::Color(255,255,255));
+  highScore.setOutlineThickness(2);
+  highScore.setOutlineColor(sf::Color(50,50,50));
+
+  sf::RectangleShape menuShade = sf::RectangleShape(sf::Vector2f(window_width,window_height));
+  menuShade.setFillColor(sf::Color(10,10,10,200));
+  menuShade.setPosition(0,0);
+  sf::Text menuText = sf::Text("Press any Key to continue", pixelSans, 25);
+  menuText.setFillColor(sf::Color(255,255,255));
+  sf::FloatRect menuSize = menuText.getLocalBounds();
+  menuText.setOrigin(sf::Vector2f(menuSize.left + menuSize.width / 2, menuSize.top + menuSize.height / 2));
+  menuText.setPosition(window_width / 2, window_height / 2);
 
   int count = 0;
   float avgFps = 0;
   float fps = 0;
 
-  //test#
+  // set initial velocity for ghosts
   blinky.setVelocity(sf::Vector2f(1,0));
 
   while (window.isOpen()) {
@@ -144,7 +175,6 @@ void Game::run()
       count = 0;
     }
 
-
     fpsDisplay.setString("FPS: " + std::to_string((int)std::min(std::round(fps), 120.0f)));
     pointsDisplay.setString("SCORE  " + std::to_string(pointCounter));
 
@@ -156,7 +186,10 @@ void Game::run()
         break;
 
       case sf::Event::KeyPressed:
-        handleInput(window,event);
+        if (gameRunning && !gameOver)
+          handleGameInput(window, event);
+        else
+          handleMenuInput(window, event);
         break;
 
       case sf::Event::Resized:
@@ -166,24 +199,7 @@ void Game::run()
     }
 
     window.clear(sf::Color::Black);
-
     window.setView(view);
-
-//    Update all game objects
-    player.update(deltaTime);
-    blinky.update(deltaTime);
-
-    if (blinky.wallReached()) {
-      spdlog::debug("wall reached");
-      blinky.setVelocity(sf::Vector2f(0,0));
-      blinky.logicGhost();
-    } else
-      spdlog::debug("wall not reached");
-
-//    Collision checks
-    checkCollisionPlayerWorld();
-    checkCollisionPlayerPoints();
-    checkCollisionPlayerGhosts();
 
 //    Draw all game objects
     world.draw(window);
@@ -193,9 +209,40 @@ void Game::run()
     inky.draw(window);
     pinky.draw(window);
 
+    if (gameOver) {
+//        GAME OVER SCREEN
+      highScore.setString("HIGH SCORE: " + std::to_string(pointCounter));
+      highScoreSize = gameOverText.getLocalBounds();
+      highScore.setOrigin(sf::Vector2f(highScoreSize.left + highScoreSize.width / 2, highScoreSize.top + highScoreSize.height / 2));
 
-    window.draw(fpsDisplay);
-    window.draw(pointsDisplay);
+      window.draw(menuShade);
+      window.draw(gameOverText);
+      window.draw(highScore);
+    } else {
+      if (gameRunning) {
+        //    GAME LOGIC
+
+        //    Update all game objects
+        player.update(deltaTime);
+
+        blinky.update(deltaTime);
+        clyde.update(deltaTime);
+        inky.update(deltaTime);
+        pinky.update(deltaTime);
+
+        //    Collision checks
+        checkCollisionPlayerWorld();
+        checkCollisionPlayerPoints();
+        checkCollisionPlayerGhosts();
+
+        window.draw(fpsDisplay);
+        window.draw(pointsDisplay);
+      } else {
+        //        MAIN MENU/PAUSE SCREEN
+        window.draw(menuShade);
+        window.draw(menuText);
+      }
+    }
 
     window.display();
   }
@@ -224,22 +271,7 @@ void Game::checkCollisionPlayerWorld()
   std::vector<sf::Sprite> mapBorders = world.getMapSprites();
   sf::Rect<float> playerBounds = player.getShape().getGlobalBounds();
 
-  std::string move;
-  if (player.getVelocity().x < 0) {
-    move = "left";
-  } else if (player.getVelocity().x > 0) {
-    move = "right";
-  } else if (player.getVelocity().y < 0) {
-    move = "up";
-  } else if (player.getVelocity().y > 0) {
-    move = "down";
-  } else {
-    return;
-  }
-
-  spdlog::debug("Tile: {} {}",player.getCurrentTile().x, player.getCurrentTile().y);
-
-//  spdlog::debug(move);
+  int moveDir = player.getCurrentDirectionIndex();
 
   int i = 0;
   for (sf::Sprite border : mapBorders) {
@@ -257,29 +289,12 @@ void Game::checkCollisionPlayerWorld()
 
     sf::Vector2i tile = player.getCurrentTile();
     sf::Vector2f newPos = (sf::Vector2f)tile * (16 * scaleFactor);
+//    sf::Vector2f newPos = player.getPosition();
     newPos.x += 8 * scaleFactor;
     newPos.y += 8 * scaleFactor;
 
-    // collision left
-    if (move == "left" && playerBounds.left < (borderBounds.left + borderBounds.width - 2)) {
-      player.setVelocity(sf::Vector2f(0, 0));
-      player.setPosition(newPos);
-
-      spdlog::debug("1; collission at {}",i);
-      return;
-    }
-
-    // collision right
-    if (move == "right" && (playerBounds.left + playerBounds.width) > (borderBounds.left + 2)) {
-      player.setVelocity(sf::Vector2f(0, 0));
-      player.setPosition(newPos);
-
-      spdlog::debug("2; collission at {}",i);
-      return;
-    }
-
     //collision top
-    if (move == "up" && playerBounds.top < (borderBounds.top + borderBounds.height - 2)) {
+    if (moveDir == 0 && playerBounds.top < (borderBounds.top + borderBounds.height - 2)) {
       player.setVelocity(sf::Vector2f(0, 0));
       player.setPosition(newPos);
 
@@ -287,12 +302,30 @@ void Game::checkCollisionPlayerWorld()
       return;
     }
 
+    // collision right
+    if (moveDir == 1 && (playerBounds.left + playerBounds.width) > (borderBounds.left + 2)) {
+      player.setVelocity(sf::Vector2f(0, 0));
+      player.setPosition(newPos);
+
+      spdlog::debug("2; collission at {}",i);
+      return;
+    }
+
     // collision bottom
-    if (move == "down" && (playerBounds.top + playerBounds.height) > (borderBounds.top + 2)) {
+    if (moveDir == 2 && (playerBounds.top + playerBounds.height) > (borderBounds.top + 2)) {
       player.setVelocity(sf::Vector2f(0,0));
       player.setPosition(newPos);
 
       spdlog::debug("4; collission at {}",i);
+      return;
+    }
+
+    // collision left
+    if (moveDir == 3 && playerBounds.left < (borderBounds.left + borderBounds.width - 2)) {
+      player.setVelocity(sf::Vector2f(0, 0));
+      player.setPosition(newPos);
+
+      spdlog::debug("1; collission at {}",i);
       return;
     }
   }
@@ -309,9 +342,9 @@ void Game::checkCollisionPlayerGhosts()
     playerBounds.intersects(blinky.getShape().getGlobalBounds()) ||
     playerBounds.intersects(clyde.getShape().getGlobalBounds())
     ) {
-    spdlog::error("GAME OVER");
+    gameOver = true;
+    spdlog::error("GAME  OVER         GAME  OVER         GAME  OVER         GAME  OVER         GAME  OVER         ");
   }
-
 }
 
 ///
@@ -351,5 +384,15 @@ const World &Game::getWorld() const
 sf::Vector2i Game::getPlayerTile()
 {
   return player.getCurrentTile();
+}
+
+int Game::getPlayerDirectionIndex()
+{
+  return player.getCurrentDirectionIndex();
+}
+
+sf::Vector2i Game::getBlinkyTile()
+{
+  return blinky.getCurrentTile();
 }
 }

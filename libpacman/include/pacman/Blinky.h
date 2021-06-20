@@ -10,10 +10,10 @@ namespace Pacman
 {
 class Blinky : public Ghost
 {
+protected:
+  void determineTargetTile() override;
 public:
   Blinky(Game* game);
-  void logicGhost() override;
-  void update(float deltaTime);
 };
 }
 

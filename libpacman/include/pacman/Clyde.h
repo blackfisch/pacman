@@ -9,13 +9,11 @@ namespace Pacman
 {
 class Clyde : public Ghost
 {
-private:
-  void update(float deltaTime);
+protected:
+  void determineTargetTile() override;
 
 public:
   Clyde(Game* game);
-  void logicGhost();
-
 };
 }
 #endif//PACMAN_CLYDE_H

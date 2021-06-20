@@ -12,9 +12,6 @@ namespace Pacman
 {
 class Point : public Edible
 {
-protected:
-  int pointValue = 10;
-
 public:
   Point(sf::Sprite sprite);
 };

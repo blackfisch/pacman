@@ -1,11 +1,13 @@
 #include <spdlog/spdlog.h>
+#include <pacman/VectorUtils.h>
 #include "pacman/Ghost.h"
 #include "pacman/Game.h"
 #include "pacman/World.h"
+#include <algorithm>
 
 namespace Pacman
 {
-Ghost::Ghost(Game* game, sf::Vector2f home): homeCorner(home), Moveable(game) {
+Ghost::Ghost(Game* game, sf::Vector2i home): homeTile(home), Moveable(game, 0.6) {
 
 }
 
@@ -14,98 +16,76 @@ void Ghost::logicFear()
   return;
 }
 
-bool Ghost::wallReached()
+void Ghost::logicGhost()
 {
-  if (velocity == sf::Vector2f())
-    return true;
+  determineTargetTile();
 
-  sf::Vector2i currentTile = getCurrentTile();
-  int direction = getDirectionIndex();
+  if (VectorUtils::find(housePosition, getCurrentTile())) {
+    targetTile = houseExit;
+    spdlog::debug("set target to exit");
+  }
 
-  //check if is already centered, otherwise let it move
-  sf::FloatRect position = getShape().getGlobalBounds();
-  position.left += position.width / 2;
-  position.top += position.height / 2;
-  sf::Vector2f center = (sf::Vector2f)currentTile * (16 * gameObject->getScale());
-  center.x += 8 * gameObject->getScale();
-  center.y += 8 * gameObject->getScale();
+  sf::Vector2f currentTile = (sf::Vector2f)getCurrentTile();
 
-  if (abs(position.left - center.x) > 1 * gameObject->getScale() || abs(position.top - center.y) > 1 * gameObject->getScale())
-    return false;
-
-  return !(getFreeSurroundingTiles().contains(direction));
-}
-std::map<int,sf::Vector2i> Ghost::getFreeSurroundingTiles()
-{
-  std::vector<std::vector<MapTiles>> walls = gameObject->getWorld().getTileMap();
-  std::map<int,sf::Vector2i> freeTiles;
-  sf::Vector2i currentTile = getCurrentTile();
+  std::vector<sf::Vector2i> freeTiles = getFreeTiles();
+  float minDist = INFINITY;
   sf::Vector2i nextTile;
 
-  std::vector<sf::Vector2i> offsets = {
-    sf::Vector2i(0, -1),
-    sf::Vector2i(1, 0),
-    sf::Vector2i(0, 1),
-    sf::Vector2i(-1, 0)
-  };
+  for (sf::Vector2i& tile : freeTiles) {
+    float distance = VectorUtils::distanceBetween(targetTile, tile);
+    if (distance < minDist) {
+      minDist = distance;
+      nextTile = tile;
+    }
+  }
 
-  for (auto it = offsets.begin(); it != offsets.end(); ++it){
-      nextTile = currentTile;
-      nextTile.x += it->x;
-      nextTile.y += it->y;
+  nextTile.x -= currentTile.x;
+  nextTile.y -= currentTile.y;
 
-      if (nextTile.x > World::boardSizeX || nextTile.x < 0 || nextTile.y > World::boardSizeY || nextTile.y < 0) {
-        continue;
-      }
+  setVelocity((sf::Vector2f)nextTile);
+}
 
-      MapTiles tileType = walls[nextTile.y][nextTile.x];
+//bool Ghost::wallReached()
+//{
+//  if (velocity == sf::Vector2f())
+//    return true;
+//
+//  sf::Vector2i currentTile = getCurrentTile();
+//  int direction = getCurrentDirectionIndex();
+//
+//  //check if is already centered, otherwise let it move
+//  sf::FloatRect position = getShape().getGlobalBounds();
+//  position.left += position.width / 2;
+//  position.top += position.height / 2;
+//  sf::Vector2f center = (sf::Vector2f)currentTile * (16 * gameObject->getScale());
+//  center.x += 8 * gameObject->getScale();
+//  center.y += 8 * gameObject->getScale();
+//
+//  if (abs(position.left - center.x) > 1 * gameObject->getScale() || abs(position.top - center.y) > 1 * gameObject->getScale())
+//    return false;
+//
+//  return !(getFreeSurroundingTiles().contains(direction));
+//}
+std::vector<sf::Vector2i> Ghost::getFreeTiles()
+{
+  std::map<int, sf::Vector2i> surroundingTiles = getSurroundingTiles();
+  int curDir = getCurrentDirectionIndex();
+  int oppositeDir = getOppositeDirection(curDir);
+  std::vector<sf::Vector2i> freeTiles;
 
-      if (tileType == MapTiles::Point || tileType == MapTiles::SuperPoint || tileType == MapTiles::Fruit || tileType == MapTiles::None) {
-        freeTiles[it - offsets.begin()] = nextTile;
-      }
+  for (auto tile : surroundingTiles) {
+    if (tile.second != sf::Vector2i() && tile.first != oppositeDir)
+      if (!VectorUtils::find(housePosition, tile.second) || VectorUtils::find(housePosition, getCurrentTile()))
+        freeTiles.push_back(tile.second);
   }
 
   return freeTiles;
 }
 void Ghost::update(float deltaTime)
 {
-//  logicGhost();
   Moveable::update(deltaTime);
-}
-int Ghost::getDirectionIndex()
-{
-  if (velocity.y < 0) {
-    // moving up
-    return 0;
-  } else if (velocity.x > 0) {
-    // moving right
-    return 1;
-  } else if (velocity.y > 0) {
-    // moving down
-    return 2;
-  } else if (velocity.x < 0) {
-    // moving left
-    return 3;
-  } else {
-    spdlog::error("something is wrong! v = ({},{})", velocity.x, velocity.y);
-    return -1;
-  }
-}
 
-int Ghost::getOppositeDirection(int dir)
-{
-  switch (dir) {
-  case 0:
-    return 2;
-  case 1:
-    return 3;
-  case 2:
-    return 0;
-  case 3:
-    return 1;
-  default:
-    return -1;
-  }
+  logicGhost();
 }
 
 }

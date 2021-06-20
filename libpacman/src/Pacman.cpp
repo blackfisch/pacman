@@ -58,9 +58,4 @@ void Pacman::flipRight(float scale)
 {
   shape.setScale(scale,scale);
 }
-
-void Pacman::setPosition(sf::Vector2f pos)
-{
-  shape.setPosition(pos);
-}
 }

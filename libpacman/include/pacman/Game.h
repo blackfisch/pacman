@@ -22,7 +22,6 @@ class Game
 private:
   World world;
   Pacman player;
- // Ghost ghosts[4];
   Clyde clyde;
   Blinky blinky;
   Inky inky;
@@ -33,18 +32,23 @@ private:
   unsigned int window_height;
   float scaleFactor = 1.0f;
   sf::View view;
+  bool gameRunning = false;
+  bool gameOver = false;
   void scaleWindow(int windowWidth, int windowHeight);
 
 public:
   Game(float scale);
   void run();
-  void handleInput(sf::RenderWindow &window, sf::Event &e);
+  void handleGameInput(sf::RenderWindow &window, sf::Event &e);
+  void handleMenuInput(sf::RenderWindow &window, sf::Event &e);
   float getScale() const;
   void checkCollisionPlayerWorld();
   void checkCollisionPlayerPoints();
   void checkCollisionPlayerGhosts();
   const World &getWorld() const;
   sf::Vector2i getPlayerTile();
+  int getPlayerDirectionIndex();
+  sf::Vector2i getBlinkyTile();
 };
 }
 

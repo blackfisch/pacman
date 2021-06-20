@@ -13,7 +13,7 @@ namespace Pacman
 {
 enum class MapTiles {
   Point, // 25
-  SuperPoint, // 50
+  PowerPellet, // 50
   Fruit, // 75
   None, // 0
   WallHorizontal, // 100
@@ -54,6 +54,7 @@ public:
   const std::vector<Edible> getEdibles() const;
   void setEdibles(const std::vector<Edible> &edibles);
   const std::vector<std::vector<MapTiles>> &getTileMap() const;
+  static bool isInWorld(sf::Vector2i tile);
 };
 }
 

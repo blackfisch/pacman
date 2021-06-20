@@ -24,7 +24,6 @@ public:
   void update(float deltaTime);
   void flipLeft(float scale);
   void flipRight(float scale);
-  void setPosition(sf::Vector2f pos);
 };
 }
 #endif//PACMAN_PACMAN_H

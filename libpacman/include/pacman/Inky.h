@@ -9,12 +9,11 @@ namespace Pacman
 {
 class Inky : public Ghost
 {
-private:
-  void update(float deltaTime);
+protected:
+  void determineTargetTile() override;
 
 public:
   Inky(Game* game);
-  void logicGhost();
 };
 
 }
